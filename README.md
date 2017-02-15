@@ -41,3 +41,39 @@ $ docker run -ti --rm \
     -e ES_PASSWORD=<your password> \
     quay.io/sfurnival/containeros-logstash:latest
 ```
+
+### Via Fleet
+
+Usually you'll want to manage the lifecycle of the logstash service using
+[fleet](https://github.com/coreos/fleet). To do so, you can create a service
+file similar to this example:
+
+**`logstash@service`**
+
+``` ini
+[Unit]
+Description=Logstash Service
+
+[Service]
+User=core
+Restart=on-failure
+TimeoutStartSec=0
+
+ExecStartPre=-/usr/bin/docker kill logstash
+ExecStartPre=-/usr/bin/docker rm logstash
+ExecStartPre=/usr/bin/docker pull quay.io/sfurnival/containeros-logstash:latest
+
+ExecStart=/usr/bin/docker run \
+    --name logstash \
+    -v /var/lib/logstash:/var/lib/logstash \
+    -v /var/log/journal:/var/log/journal:ro \
+    -e ES_HOST='<your elastic host>' \
+    -e ES_USER=<username> \
+    -e ES_PASSWORD=<your password> \
+    quay.io/sfurnival/containeros-logstash:latest
+
+ExecStop=/usr/bin/docker stop logstash
+
+[X-Fleet]
+Global=true
+```
