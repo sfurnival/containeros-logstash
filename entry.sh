@@ -23,7 +23,7 @@ sed -e "s/%ES_HOST%/${ES_HOST}/" \
     -e "s/%ES_INDEX_SUFFIX%/${ES_INDEX_SUFFIX}/" \
     -e "s/%ES_FLUSH_SIZE%/${ES_FLUSH_SIZE}/" \
     -e "s/%ES_IDLE_FLUSH_TIME%/${ES_IDLE_FLUSH_TIME}/" \
-    -i /logstash/conf.d/**/*.conf
+    -i /logstash/conf.d/logstash.conf
 
 ulimit -n ${LS_OPEN_FILES} > /dev/null
 
@@ -31,5 +31,5 @@ exec /logstash/bin/logstash --log.format json \
   --log.level ${LS_LOG_LEVEL} \
   --pipeline.batch.size ${LS_PIPELINE_BATCH_SIZE} \
   --config.reload.automatic \
-  -f "/logstash/conf.d/logstash.conf" \
+  -f "/logstash/conf.d/**/*.conf" \
   ${LOGSTASH_ARGS}
